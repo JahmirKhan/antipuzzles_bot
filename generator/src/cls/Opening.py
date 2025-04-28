@@ -15,10 +15,16 @@ class Opening:
         self.parentId = 0
 
         if moves_str != '':
-            self = self.search_opening_by_string(moves_str)
-
+            found_opening = self.search_opening_by_string(moves_str) 
+            #self = self.search_opening_by_string(moves_str) //it does not work
+            if found_opening.id != 0:
+                self.id = found_opening.id
+                self.name = found_opening.name
+                self.sequence = found_opening.sequence
+                self.parentId = found_opening.parentId
 
     def search_opening_by_string(self, moves_str: str):
+        print('moves_str:', moves_str.split(' '))
         moves = []
         moves = moves_str.split(' ')
 
@@ -31,11 +37,10 @@ class Opening:
 
             self.cursor.execute('SELECT * FROM openings WHERE sequence = ?', (string,))
             result = self.cursor.fetchall()
-
-            print(result)
-
             if len(result) > 0:
+                print(string, string)
                 result = result[-1]
+                print('result:', result)
 
                 op = Opening(self.connection)
                 op.id = result[0]
@@ -117,6 +122,6 @@ def get_opening(node: chess.pgn.Game, connection: sqlite3.Connection) -> Opening
             move_parts.append(f"{move_number}. {white}")
     move_str = ' '.join(move_parts)
 
-    print(move_str)
+    print('move_str', move_str)
     
     return Opening(connection, moves_str=move_str)
