@@ -2,7 +2,7 @@ import sqlite3
 import chess.pgn
 
 class Game:
-    def __init__(self, connection: sqlite3.Connection, searchById='', searchByGameId='') -> None:
+    def __init__(self, connection: sqlite3.Connection, db_id='', db_gameId='') -> None:
         """
         This class stores game headers.
 
@@ -51,14 +51,15 @@ class Game:
         
         self.valid = False # Is the game loaded or not
 
-        if searchById != '':
-            # TODO: search game by it's id in the database
-            print(self.cursor.execute(f"SELECT * FROM games WHERE id = {searchById} LIMIT 1"))
+        if db_id:
+            game = self.cursor.execute(f"SELECT * FROM puzzles WHERE id = {db_id} LIMIT 1").fetchone()
+            for key, value in game.items():
+                self.set(self, key, value)
 
-        elif searchByGameId != '':
-            # TODO: search game by GameId (provided by lichess)
-            print(self.cursor.execute(f"SELECT * FROM games WHERE id = {searchById} LIMIT 1"))
-        
+        elif db_gameId:
+            game = self.cursor.execute(f"SELECT * FROM puzzles WHERE id = {db_gameId} LIMIT 1").fetchone()            
+            for key, value in game.items():
+                self.set(self, key, value)
 
     def loadFromHeaders(self, headers: chess.pgn.Headers):
         self.Event = headers['Event']

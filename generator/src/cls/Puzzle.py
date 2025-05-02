@@ -5,7 +5,7 @@ from src.cls.Opening import *
 import chess
 
 class Puzzle:
-    def __init__(self, connection: sqlite3.Connection, searchById=''):
+    def __init__(self, connection: sqlite3.Connection, db_id=""):
         self.connection = connection
         self.cursor = self.connection.cursor()
 
@@ -18,8 +18,12 @@ class Puzzle:
         self.opening = Opening(self.connection)
         self.isProcessed = False
         self.turn = True
-
-        self.game = Game(connection)
+        
+        if(db_id):
+            puzzle = self.cursor.execute(f"SELECT * FROM puzzles WHERE id = {db_id} LIMIT 1").fetchone()
+            for key, value in puzzle.items():
+                self.set(self, key, value)
+        self.game = Game(connection, db_gameId=self.gameId)
 
     def loadFromBoard(self, board: chess.Board):
         self.fen = board.fen()
